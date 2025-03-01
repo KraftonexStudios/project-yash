@@ -15,6 +15,8 @@ import NotFound from "@/pages/NotFound";
 import Emergency from "@/pages/Emergency";
 import ConsultationBooking from "@/pages/ConsultationBooking";
 import MyBookings from "@/pages/MyBookings";
+import Diet from "@/pages/Diet";
+import CalorieCalculator from "@/pages/CalorieCalculator";
 
 const AppRoutes = () => {
   return (
@@ -33,6 +35,8 @@ const AppRoutes = () => {
       <Route path="/ayushman" element={<Ayushman />} />
       <Route path="/consultation/:doctorId" element={<ConsultationBooking />} />
       <Route path="/my-bookings" element={<MyBookings />} />
+      <Route path="/diet" element={<Diet />} />
+      <Route path="/calorie-calculator" element={<CalorieCalculator />} />
       <Route path="*" element={<NotFound />} />
       <Route path="/emergency" element={<Emergency />} />
     </Routes>

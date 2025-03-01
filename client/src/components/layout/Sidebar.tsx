@@ -12,6 +12,7 @@ import {
   X,
   Award,
   AlertCircle,
+  Apple,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,11 @@ const sidebarItems = [
     path: "/health-tracker",
   },
   { icon: Stethoscope, label: "Consult Doctor", path: "/consultation" },
+  {
+    icon: Apple,
+    label: "Diet Plans",
+    path: "/diet",
+  },
   { icon: Award, label: "Ayushman", path: "/ayushman" },
   { icon: Activity, label: "Symptoms", path: "/symptoms" },
   { icon: Pill, label: "Medicine", path: "/medicine" },
