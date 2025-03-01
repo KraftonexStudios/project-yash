@@ -8,6 +8,7 @@ import doctorRouter from "./routes/doctor.route.js";
 import fitnessRouter from "./routes/fitness.route.js";
 import aiRouter from "./routes/ai.js";
 import ayushmanRouter from "./routes/ayushman.route.js";
+import placesRouter from './routes/places.js';
 
 const app = express();
 
@@ -41,5 +42,6 @@ app.use("/api/doctors", doctorRouter);
 app.use("/api/fitness", fitnessRouter);
 app.use("/api/ai", aiRouter);
 app.use("/api/ayushman", ayushmanRouter);
+app.use('/api/places', placesRouter);
 
 export default app;

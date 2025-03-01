@@ -23,6 +23,7 @@ import ChatCall from "./pages/chat/VideoChat";
 import DocRegister from "./auth/DocRegister";
 import AiDoctor from "./pages/AiDoctor";
 import Ayushman from "./pages/Ayushman";
+import Emergency from "./pages/Emergency";
 
 const queryClient = new QueryClient();
 
@@ -134,6 +135,14 @@ const App = () => (
                 element={
                   <AuthProvider>
                     <Ayushman />
+                  </AuthProvider>
+                }
+              />
+              <Route
+                path="/emergency"
+                element={
+                  <AuthProvider>
+                    <Emergency />
                   </AuthProvider>
                 }
               />

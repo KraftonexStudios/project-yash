@@ -13,6 +13,7 @@ import {
   Menu,
   X,
   Award,
+  AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,7 @@ const sidebarItems = [
   { icon: LineChart, label: "BMI Index", path: "/bmi" },
   { icon: Pill, label: "Medicine", path: "/medicine" },
   { icon: Bot, label: "AI Doctor", path: "/ai-doctor" },
+  { icon: AlertCircle, label: "Emergency", path: "/emergency" },
 ];
 
 export function Sidebar() {

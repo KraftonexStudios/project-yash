@@ -40,12 +40,29 @@ const profileSchema = z.object({
     .min(10, "Phone number must be at least 10 characters"),
 });
 
+// Add emergency contact schema
+const emergencyContactSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  phoneNumber: z.string().min(10, "Phone number must be at least 10 characters"),
+  relationship: z.string().min(2, "Relationship must be at least 2 characters"),
+});
+
 const Profile = () => {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
   const [location, setLocation] = useState({ longitude: null, latitude: null });
   const [isLocating, setIsLocating] = useState(false);
+  const [emergencyContacts, setEmergencyContacts] = useState(() => {
+    const saved = localStorage.getItem('emergencyContacts');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [isAddingContact, setIsAddingContact] = useState(false);
+  const [newContact, setNewContact] = useState({
+    name: '',
+    phoneNumber: '',
+    relationship: ''
+  });
 
   const { currentDoctor, currentUser, isLoading, userType } = useAuth();
 
@@ -193,6 +210,55 @@ const Profile = () => {
     }
   };
 
+  // Function to validate Indian phone number
+  const validateIndianPhoneNumber = (phone: string) => {
+    const phoneRegex = /^(\+91[\-\s]?)?[0]?(91)?[6789]\d{9}$/;
+    return phoneRegex.test(phone.replace(/[-\s]/g, ''));
+  };
+
+  // Function to add emergency contact
+  const addEmergencyContact = () => {
+    try {
+      // Validate the new contact
+      emergencyContactSchema.parse(newContact);
+      
+      // Validate Indian phone number
+      if (!validateIndianPhoneNumber(newContact.phoneNumber)) {
+        throw new Error("Please enter a valid Indian phone number");
+      }
+
+      const updatedContacts = [...emergencyContacts, newContact];
+      setEmergencyContacts(updatedContacts);
+      localStorage.setItem('emergencyContacts', JSON.stringify(updatedContacts));
+      
+      setNewContact({ name: '', phoneNumber: '', relationship: '' });
+      setIsAddingContact(false);
+      
+      toast({
+        title: "Contact Added",
+        description: `${newContact.name} has been added to your emergency contacts.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Validation Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Function to remove emergency contact
+  const removeEmergencyContact = (index: number) => {
+    const updatedContacts = emergencyContacts.filter((_, i) => i !== index);
+    setEmergencyContacts(updatedContacts);
+    localStorage.setItem('emergencyContacts', JSON.stringify(updatedContacts));
+    
+    toast({
+      title: "Contact Removed",
+      description: "Emergency contact has been removed.",
+    });
+  };
+
   return (
     <MainLayout>
       <div className="animate-in">
@@ -334,6 +400,85 @@ const Profile = () => {
                   </div>
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Emergency Contacts Card */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Emergency Contacts</CardTitle>
+              <Button
+                variant="outline"
+                onClick={() => setIsAddingContact(!isAddingContact)}
+              >
+                {isAddingContact ? "Cancel" : "Add Contact"}
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {isAddingContact && (
+                <div className="mb-6 space-y-4">
+                  <div className="grid gap-4">
+                    <div>
+                      <Label htmlFor="name">Name</Label>
+                      <Input
+                        id="name"
+                        value={newContact.name}
+                        onChange={(e) => setNewContact({ ...newContact, name: e.target.value })}
+                        placeholder="Contact Name"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="phoneNumber">Phone Number</Label>
+                      <Input
+                        id="phoneNumber"
+                        value={newContact.phoneNumber}
+                        onChange={(e) => setNewContact({ ...newContact, phoneNumber: e.target.value })}
+                        placeholder="Phone Number (e.g., +91 98765 43210)"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="relationship">Relationship</Label>
+                      <Input
+                        id="relationship"
+                        value={newContact.relationship}
+                        onChange={(e) => setNewContact({ ...newContact, relationship: e.target.value })}
+                        placeholder="Relationship (e.g., Parent, Spouse)"
+                      />
+                    </div>
+                  </div>
+                  <Button onClick={addEmergencyContact} className="w-full">
+                    Add Emergency Contact
+                  </Button>
+                </div>
+              )}
+
+              <div className="space-y-4">
+                {emergencyContacts.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-4">
+                    No emergency contacts added yet.
+                  </p>
+                ) : (
+                  emergencyContacts.map((contact, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
+                      <div>
+                        <h3 className="font-semibold">{contact.name}</h3>
+                        <p className="text-sm text-muted-foreground">{contact.phoneNumber}</p>
+                        <p className="text-sm text-muted-foreground">{contact.relationship}</p>
+                      </div>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => removeEmergencyContact(index)}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ))
+                )}
+              </div>
             </CardContent>
           </Card>
 
