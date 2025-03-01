@@ -8,7 +8,7 @@ import { useEffect } from "react";
 const navItems = [
   { icon: Home, label: "Home", path: "/" },
   { icon: Calendar, label: "Appointments", path: "/appointments" },
-  { icon: Activity, label: "Health", path: "/preventive-health" },
+  { icon: Activity, label: "Health", path: "/health-tracker" },
   { icon: User, label: "Profile", path: "/profile" },
 ];
 

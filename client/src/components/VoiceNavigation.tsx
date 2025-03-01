@@ -85,35 +85,17 @@ const AVAILABLE_ROUTES = {
     aliases: ['health', 'fitness', 'tracking', 'metrics', 'health tracker', 'fitness data'],
     description: 'Health and fitness tracking dashboard'
   },
-  '/appointments': {
-    path: '/appointments',
-    name: 'Appointments',
-    aliases: ['appointments', 'schedule', 'booking', 'consultation', 'book appointment', 'doctor appointment'],
-    description: 'Book and manage appointments'
-  },
-  '/preventive-health': {
-    path: '/preventive-health',
-    name: 'Preventive Health',
-    aliases: ['preventive', 'prevention', 'health prevention', 'preventive care', 'preventive health'],
-    description: 'Preventive health information and recommendations'
-  },
-  '/insurance': {
-    path: '/insurance',
-    name: 'Insurance',
-    aliases: ['insurance', 'coverage', 'health insurance', 'medical insurance'],
-    description: 'Insurance coverage and plans'
+  '/consultation': {
+    path: '/consultation',
+    name: 'Consult Doctor',
+    aliases: ['consult', 'doctor', 'specialist', 'consultation', 'medical consultation', 'find doctor', 'book doctor'],
+    description: 'Find and consult specialist doctors'
   },
   '/symptoms': {
     path: '/symptoms',
     name: 'Symptoms',
     aliases: ['symptoms', 'symptom checker', 'health symptoms', 'check symptoms'],
     description: 'Check and track symptoms'
-  },
-  '/bmi': {
-    path: '/bmi',
-    name: 'BMI Index',
-    aliases: ['bmi', 'body mass index', 'weight index', 'bmi calculator'],
-    description: 'BMI calculator and tracking'
   },
   '/medicine': {
     path: '/medicine',
@@ -185,15 +167,8 @@ const VoiceNavigation: React.FC = () => {
       description: 'health and fitness tracking dashboard'
     },
     {
-      path: '/preventive-health',
-      keywords: ['preventive', 'prevention', 'health prevention', 'preventive care', 'preventive health'],
-      synonyms: ['wellbeing', 'shape', 'condition', 'training', 'gym'],
-      contextualHints: ['track', 'monitor', 'check', 'see', 'view', 'look at', 'show'],
-      description: 'preventive health information and recommendations'
-    },
-    {
-      path: '/appointments',
-      keywords: ['appointment', 'schedule', 'booking', 'consultation', 'visit'],
+      path: '/consultation',
+      keywords: ['consult', 'doctor', 'specialist', 'consultation', 'medical consultation', 'find doctor', 'book doctor'],
       synonyms: ['meeting', 'session', 'reservation', 'slot', 'timing'],
       contextualHints: ['book', 'schedule', 'check', 'view', 'see', 'manage'],
       description: 'appointment scheduling and management'
@@ -262,20 +237,11 @@ const VoiceNavigation: React.FC = () => {
     },
     {
       patterns: [
-        /(?:go|navigate|take me|show|open)?\s*(?:to|the)?\s*(?:my)?\s*profile/i,
-        /(?:show|view|open)\s*(?:my)?\s*(?:account|profile)\s*(?:settings|info|page)?/i
+        /(?:go|navigate|take me|show|open)?\s*(?:to|the)?\s*(?:my)?\s*consultation/i,
+        /(?:show|view|check)\s*(?:my)?\s*(?:scheduled)?\s*(?:consultation|booking|schedule)/i
       ],
       action: 'navigate',
-      parameters: { path: '/preventive-health' },
-      confidence: 0.9
-    },
-    {
-      patterns: [
-        /(?:go|navigate|take me|show|open)?\s*(?:to|the)?\s*(?:my)?\s*appointments/i,
-        /(?:show|view|check)\s*(?:my)?\s*(?:scheduled)?\s*(?:appointments|bookings|schedule)/i
-      ],
-      action: 'navigate',
-      parameters: { path: '/appointments' },
+      parameters: { path: '/consultation' },
       confidence: 0.9
     },
     // Data query patterns
@@ -368,10 +334,8 @@ const VoiceNavigation: React.FC = () => {
       entities.page = '/';
     } else if (normalizedText.includes('health-tracker') || normalizedText.includes('health')) {
       entities.page = '/health-tracker';
-    } else if (normalizedText.includes('preventive-health') || normalizedText.includes('profile')) {
-      entities.page = '/preventive-health';
-    } else if (normalizedText.includes('appointments') || normalizedText.includes('schedule')) {
-      entities.page = '/appointments';
+    } else if (normalizedText.includes('consultation') || normalizedText.includes('consult')) {
+      entities.page = '/consultation';
     }
 
     // Look for data types
