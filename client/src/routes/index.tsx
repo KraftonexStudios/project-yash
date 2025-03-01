@@ -17,6 +17,7 @@ import ConsultationBooking from "@/pages/ConsultationBooking";
 import MyBookings from "@/pages/MyBookings";
 import Diet from "@/pages/Diet";
 import CalorieCalculator from "@/pages/CalorieCalculator";
+import DoctorDashboard from "@/pages/doctor/DoctorDashboard";
 
 const AppRoutes = () => {
   return (
@@ -25,6 +26,7 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/doc-register" element={<DocRegister />} />
+      <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/health-tracker" element={<HealthTracker />} />
       <Route path="/consultation" element={<Consultation />} />

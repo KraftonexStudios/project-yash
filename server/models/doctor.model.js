@@ -10,13 +10,14 @@ const DoctorSchema = new Schema(
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
     phoneNumber: { type: String, required: true },
     profileImage: { type: String },
     
     // Professional Details
     specialization: { 
       type: String, 
-      required: true,
+      required: [true, 'Specialization is required during registration'],
       enum: [
         "General Physician",
         "Cardiologist",
@@ -40,8 +41,15 @@ const DoctorSchema = new Schema(
       institute: String,
       year: Number
     }],
-    experience: { type: Number, required: true }, // in years
-    registrationNumber: { type: String, required: true, unique: true },
+    experience: { type: Number, required: [true, 'Experience is required during registration'] },
+    registrationNumber: { 
+      type: String, 
+      required: [function() {
+        // Only required during initial registration
+        return this.isNew;
+      }, 'Registration number is required during registration'],
+      unique: true 
+    },
     
     // Practice Details
     clinicAddress: {
@@ -54,7 +62,13 @@ const DoctorSchema = new Schema(
     },
     
     // Consultation Details
-    consultationFees: { type: Number, required: true },
+    consultationFees: { 
+      type: Number, 
+      required: [function() {
+        // Only required during initial registration
+        return this.isNew;
+      }, 'Consultation fees are required during registration']
+    },
     availableSlots: [{
       day: { 
         type: String, 
@@ -80,7 +94,13 @@ const DoctorSchema = new Schema(
     languages: [String],
     
     // Additional Information
-    about: { type: String, required: true },
+    about: { 
+      type: String, 
+      required: [function() {
+        // Only required during initial registration
+        return this.isNew;
+      }, 'About information is required during registration']
+    },
     awards: [String],
     publications: [{
       title: String,
@@ -128,19 +148,25 @@ DoctorSchema.methods.generateAuthToken = function () {
 
 // Compare Password for Login
 DoctorSchema.methods.comparePassword = async function (enteredPassword) {
+  if (!this.password || !enteredPassword) {
+    throw new Error("Password comparison failed: Missing password");
+  }
   return await bcrypt.compare(enteredPassword, this.password);
 };
-DoctorSchema.statics.hashPassword = async function (password) {
-  return await bcrypt.hash(password, 10);
-};
+
+// Hash Password before saving
+DoctorSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
+  try {
+    this.password = await bcrypt.hash(this.password, 10);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 // DoctorSchema.index({ location: "2dsphere" });
 
 export default mongoose.model("Doctor", DoctorSchema);
-
-// Middleware to hash password before saving
-// DoctorSchema.pre("save", async function (next) {
-//   if (!this.isModified("password")) return next();
-//   this.password = await bcrypt.hash(this.password, 10);
-//   next();
-// });

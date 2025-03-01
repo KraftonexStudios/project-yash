@@ -39,7 +39,13 @@ const login = async ({ credentials, loginType }) => {
 
   const { data } = await axios.post(endpoint, credentials);
   setAuthData(data.token, loginType);
-  return data;
+  
+  // Return data in a consistent format
+  return {
+    token: data.token,
+    user: loginType === "user" ? data.user : null,
+    doctor: loginType === "doctor" ? data.doctor : null
+  };
 };
 
 // 🔹 Updated useLogin Hook (Accepts loginType)
@@ -47,7 +53,7 @@ export const useLogin = () => {
   const queryClient = useQueryClient();
 
   return useMutation<
-    { user: any }, // Adjust the type as needed
+    { token: string; user?: any; doctor?: any },
     Error,
     {
       credentials: { email: string; password: string };
@@ -56,8 +62,24 @@ export const useLogin = () => {
   >({
     mutationFn: ({ credentials, loginType }) =>
       login({ credentials, loginType }),
-    onSuccess: (data) => {
-      queryClient.setQueryData(["currentUser"], data.user);
+    onSuccess: (data, variables) => {
+      // Clear both user and doctor data first
+      queryClient.setQueryData(["currentUser"], null);
+      queryClient.setQueryData(["currentDoctor"], null);
+      
+      // Then set the appropriate data
+      if (variables.loginType === "doctor") {
+        queryClient.setQueryData(["currentDoctor"], data.doctor);
+      } else {
+        queryClient.setQueryData(["currentUser"], data.user);
+      }
+      
+      // Force a refetch of the profile
+      if (variables.loginType === "doctor") {
+        queryClient.invalidateQueries({ queryKey: ["currentDoctor"] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      }
     },
   });
 };
