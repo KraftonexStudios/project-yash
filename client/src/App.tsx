@@ -2,33 +2,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import HealthTracker from "./pages/HealthTracker";
-import Appointments from "./pages/Appointments";
-import PreventiveHealth from "./pages/PreventiveHealth";
-import Insurance from "./pages/Insurance";
-import Symptoms from "./pages/Symptoms";
-import BMI from "./pages/BMI";
-import Medicine from "./pages/Medicine";
-import NotFound from "./pages/NotFound";
-import Login from "./auth/Login";
-import Register from "./auth/Register";
+import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "./utils/theme.provider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import Profile from "./pages/Profile";
-// import ChatPage from "./components/Chat";
 import { AuthProvider } from "./auth/AuthProvider";
-import ChatCall from "./pages/chat/VideoChat";
-import DocRegister from "./auth/DocRegister";
-import AiDoctor from "./pages/AiDoctor";
-import Ayushman from "./pages/Ayushman";
-<<<<<<< HEAD
-import Emergency from "./pages/Emergency";
-=======
 import { SocketProvider } from "@/context/SocketContext";
 import AppRoutes from "@/routes";
->>>>>>> 47375d7515f9f5fb5b9bf50f845854b811b063b1
 
 const queryClient = new QueryClient();
 
@@ -43,132 +22,11 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-<<<<<<< HEAD
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <AuthProvider>
-                    <Index />
-                  </AuthProvider>
-                }
-              />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/doc-register" element={<DocRegister />} />
-              <Route
-                path="/profile"
-                element={
-                  <AuthProvider>
-                    <Profile />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/health-tracker"
-                element={
-                  <AuthProvider>
-                    <HealthTracker />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/appointments"
-                element={
-                  <AuthProvider>
-                    <Appointments />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/preventive-health"
-                element={
-                  <AuthProvider>
-                    <PreventiveHealth />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/insurance"
-                element={
-                  <AuthProvider>
-                    <Insurance />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/symptoms"
-                element={
-                  <AuthProvider>
-                    <Symptoms />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/bmi"
-                element={
-                  <AuthProvider>
-                    <BMI />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/medicine"
-                element={
-                  <AuthProvider>
-                    <Medicine />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/chat"
-                element={
-                  <AuthProvider>
-                    <ChatCall />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/ai-doctor"
-                element={
-                  <AuthProvider>
-                    <AiDoctor />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/ayushman"
-                element={
-                  <AuthProvider>
-                    <Ayushman />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/emergency"
-                element={
-                  <AuthProvider>
-                    <Emergency />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="*"
-                element={
-                  <AuthProvider>
-                    <NotFound />
-                  </AuthProvider>
-                }
-              />
-            </Routes>
-=======
             <AuthProvider>
               <SocketProvider>
                 <AppRoutes />
-                <Toaster />
               </SocketProvider>
             </AuthProvider>
->>>>>>> 47375d7515f9f5fb5b9bf50f845854b811b063b1
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>

@@ -15,6 +15,7 @@ import ChatCall from "@/pages/chat/VideoChat";
 import AiDoctor from "@/pages/AiDoctor";
 import Ayushman from "@/pages/Ayushman";
 import NotFound from "@/pages/NotFound";
+import Emergency from "@/pages/Emergency";
 
 const AppRoutes = () => {
   return (
@@ -35,6 +36,14 @@ const AppRoutes = () => {
       <Route path="/ai-doctor" element={<AiDoctor />} />
       <Route path="/ayushman" element={<Ayushman />} />
       <Route path="*" element={<NotFound />} />
+      <Route
+                path="/emergency"
+                element={
+                  
+                    <Emergency />
+                  
+                }
+              />
     </Routes>
   );
 };
