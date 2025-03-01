@@ -43,7 +43,7 @@ const AyushmanStatus = () => {
     setResult(null);
 
     try {
-      const response = await axios.post('/api/ayushman/check-status', {
+      const response = await axios.post('/ayushman/check-status', {
         aadhaarNumber: formData.aadhaarNumber,
         mobileNumber: formData.mobileNumber
       });

@@ -30,6 +30,7 @@ import { MapPin, Wifi, WifiOff } from "lucide-react";
 import { Switch } from "@radix-ui/react-switch";
 import axios from "axios";
 import api from "@/utils/api";
+import { useSocket } from "@/context/SocketContext";
 
 const profileSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -41,6 +42,7 @@ const profileSchema = z.object({
 });
 
 const Profile = () => {
+  const { socket } = useSocket();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
@@ -48,6 +50,7 @@ const Profile = () => {
   const [isLocating, setIsLocating] = useState(false);
 
   const { currentDoctor, currentUser, isLoading, userType } = useAuth();
+  const currentId = userType === "user" ? currentUser?._id : currentDoctor?._id;
 
   useEffect(() => {
     // Initialize online status from user data
@@ -176,6 +179,14 @@ const Profile = () => {
       console.log(response, "status data");
 
       if (response.status === 200) {
+        // Emit socket event for real-time status update
+        if (socket && currentId) {
+          socket.emit("user-status-change", {
+            userId: currentId,
+            isOnline: newStatus
+          });
+        }
+
         toast({
           title: `Status: ${newStatus ? "Online" : "Offline"}`,
           description: `You are now ${newStatus ? "online" : "offline"}.`,

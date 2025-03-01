@@ -23,6 +23,8 @@ import ChatCall from "./pages/chat/VideoChat";
 import DocRegister from "./auth/DocRegister";
 import AiDoctor from "./pages/AiDoctor";
 import Ayushman from "./pages/Ayushman";
+import { SocketProvider } from "@/context/SocketContext";
+import AppRoutes from "@/routes";
 
 const queryClient = new QueryClient();
 
@@ -37,115 +39,12 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <AuthProvider>
-                    <Index />
-                  </AuthProvider>
-                }
-              />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/doc-register" element={<DocRegister />} />
-              <Route
-                path="/profile"
-                element={
-                  <AuthProvider>
-                    <Profile />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/health-tracker"
-                element={
-                  <AuthProvider>
-                    <HealthTracker />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/appointments"
-                element={
-                  <AuthProvider>
-                    <Appointments />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/preventive-health"
-                element={
-                  <AuthProvider>
-                    <PreventiveHealth />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/insurance"
-                element={
-                  <AuthProvider>
-                    <Insurance />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/symptoms"
-                element={
-                  <AuthProvider>
-                    <Symptoms />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/bmi"
-                element={
-                  <AuthProvider>
-                    <BMI />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/medicine"
-                element={
-                  <AuthProvider>
-                    <Medicine />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/chat"
-                element={
-                  <AuthProvider>
-                    <ChatCall />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/ai-doctor"
-                element={
-                  <AuthProvider>
-                    <AiDoctor />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="/ayushman"
-                element={
-                  <AuthProvider>
-                    <Ayushman />
-                  </AuthProvider>
-                }
-              />
-              <Route
-                path="*"
-                element={
-                  <AuthProvider>
-                    <NotFound />
-                  </AuthProvider>
-                }
-              />
-            </Routes>
+            <AuthProvider>
+              <SocketProvider>
+                <AppRoutes />
+                <Toaster />
+              </SocketProvider>
+            </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>

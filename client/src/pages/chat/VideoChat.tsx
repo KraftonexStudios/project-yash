@@ -16,12 +16,12 @@ import { Phone, Video, Send, UserCheck, User2, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/auth/AuthProvider";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import io from "socket.io-client";
 import api from "@/utils/api";
 import { doctorProfileProps, UserProps } from "@/lib/user.type";
 import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import { ZIM } from "zego-zim-web";
 import { randomID } from "@/lib/utils";
+import { useSocket } from "@/context/SocketContext";
 
 // Define types
 interface User {
@@ -72,6 +72,7 @@ interface Conversation {
 }
 
 const Chat = () => {
+  const { socket } = useSocket();
   const queryClient = useQueryClient();
   const { currentUser, currentDoctor, userType } = useAuth();
   const [selectedRecipient, setSelectedRecipient] = useState<
@@ -84,7 +85,6 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState("");
   const [isVideoCall, setIsVideoCall] = useState(false);
   const { toast } = useToast();
-  const socketRef = useRef<any>(null);
   const messageEndRef = useRef<HTMLDivElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const [zegoCloud, setZegoCloud] = useState<any>(null);
@@ -182,26 +182,12 @@ const Chat = () => {
     };
   }, [currentId, currentUser, currentDoctor]);
 
-  // Initialize socket connection
+  // Initialize socket listeners
   useEffect(() => {
-    if (!currentId) return;
-
-    // Connect to socket server
-    socketRef.current = io("http://localhost:8000", {
-      query: {
-        userId: currentId,
-        userType,
-      },
-    });
-
-    // Send user connect event
-    socketRef.current.emit("user-connect", {
-      userId: currentId,
-      userType,
-    });
+    if (!socket || !currentId) return;
 
     // Listen for new messages
-    socketRef.current.on("new-message", (data) => {
+    socket.on("new-message", (data) => {
       // If the message is for the current conversation, add it to messages
       if (
         currentConversation &&
@@ -215,7 +201,7 @@ const Chat = () => {
     });
 
     // Listen for message notifications
-    socketRef.current.on("message-notification", (data) => {
+    socket.on("message-notification", (data) => {
       toast({
         title: "New Message",
         description: `You have a new message in conversation ${
@@ -225,39 +211,49 @@ const Chat = () => {
     });
 
     // Listen for user status changes
-    socketRef.current.on("user-status-change", (data) => {
+    socket.on("user-status-change", (data) => {
       // Update user status in the list
       queryClient.invalidateQueries({ queryKey: ["available-users"] });
+      
+      // Update selected recipient status if it matches
+      if (selectedRecipient && selectedRecipient._id === data.userId) {
+        setSelectedRecipient((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            isOnline: data.isOnline
+          };
+        });
+      }
     });
 
-    // Clean up on unmount
     return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-      }
+      socket.off("new-message");
+      socket.off("message-notification");
+      socket.off("user-status-change");
     };
-  }, [currentId, userType]);
+  }, [socket, currentId, currentConversation, selectedRecipient]);
 
   // Fetch user conversations
   const fetchConversations = () => {
-    if (!currentId) return;
+    if (!socket || !currentId) return;
 
-    socketRef.current.emit("get-conversations", { userId: currentId });
-    socketRef.current.on("user-conversations", (data) => {
+    socket.emit("get-conversations", { userId: currentId });
+    socket.on("user-conversations", (data) => {
       setConversations(data.conversations);
     });
   };
 
   // Fetch conversations on component mount
   useEffect(() => {
-    if (socketRef.current) {
+    if (socket) {
       fetchConversations();
     }
-  }, [socketRef.current]);
+  }, [socket]);
 
   // Fetch chat history when a recipient is selected
   useEffect(() => {
-    if (!selectedRecipient || !currentId) return;
+    if (!socket || !selectedRecipient || !currentId) return;
 
     // Find existing conversation or create new one
     const recipientId = selectedRecipient._id;
@@ -269,16 +265,16 @@ const Chat = () => {
       setCurrentConversation(existingConversation);
 
       // Fetch messages for this conversation
-      socketRef.current.emit("get-chat-history", {
+      socket.emit("get-chat-history", {
         conversationId: existingConversation._id,
       });
 
-      socketRef.current.on("chat-history", (data) => {
+      socket.on("chat-history", (data) => {
         if (data.conversationId === existingConversation._id) {
           setMessages(data.messages);
 
           // Mark messages as read
-          socketRef.current.emit("mark-messages-read", {
+          socket.emit("mark-messages-read", {
             conversationId: existingConversation._id,
             userId: currentId,
           });
@@ -288,7 +284,11 @@ const Chat = () => {
       setCurrentConversation(null);
       setMessages([]);
     }
-  }, [selectedRecipient, currentId, conversations]);
+
+    return () => {
+      socket.off("chat-history");
+    };
+  }, [selectedRecipient, currentId, conversations, socket]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -297,7 +297,7 @@ const Chat = () => {
 
   // Send message handler
   const handleSendMessage = () => {
-    if (!newMessage.trim() || !selectedRecipient || !currentId) return;
+    if (!socket || !newMessage.trim() || !selectedRecipient || !currentId) return;
 
     const recipientId = selectedRecipient._id;
     const recipientType = userType === "user" ? "doctor" : "user";
@@ -312,7 +312,7 @@ const Chat = () => {
     };
 
     // Send message via socket
-    socketRef.current.emit("send-message", messageData);
+    socket.emit("send-message", messageData);
 
     // Clear input
     setNewMessage("");
@@ -368,53 +368,6 @@ const Chat = () => {
   };
 
   // Start audio call
-  const startAudioCall = async () => {
-    if (!selectedRecipient || !zegoCloud) return;
-
-    const roomID = `room_${randomID(5)}`;
-
-    try {
-      await zegoCloud.sendCallInvitation({
-        callees: [
-          {
-            userID: selectedRecipient._id,
-            userName: getRecipientName(selectedRecipient),
-          },
-        ],
-        callType: ZegoUIKitPrebuilt.InvitationTypeVoiceCall,
-        timeout: 60,
-      });
-
-      if (videoContainerRef.current) {
-        zegoCloud.joinRoom({
-          container: videoContainerRef.current,
-          sharedLinks: [
-            {
-              name: "Copy Link",
-              url: `${window.location.origin}/room?roomID=${roomID}`,
-            },
-          ],
-          scenario: {
-            mode: ZegoUIKitPrebuilt.OneONoneCall,
-          },
-          showPreJoinView: false,
-        });
-      }
-
-      setIsVideoCall(true);
-
-      toast({
-        title: "Starting audio call",
-        description: `Connecting to ${getRecipientName(selectedRecipient)}...`,
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to start audio call",
-        variant: "destructive",
-      });
-    }
-  };
 
   // End video call
   const endVideoCall = () => {
@@ -529,7 +482,11 @@ const Chat = () => {
                           ? "bg-accent"
                           : ""
                       }`}
-                      onClick={() => setSelectedRecipient({ ...recipient, _id: recipient._id, isOnline: true })}
+                      onClick={() => setSelectedRecipient({ 
+                        ...recipient, 
+                        _id: recipient._id, 
+                        isOnline: recipient.isOnline 
+                      })}
                     >
                       <div className="relative">
                         <Avatar className="h-10 w-10">
@@ -599,7 +556,6 @@ const Chat = () => {
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={startAudioCall}
                       >
                         <Phone className="h-4 w-4" />
                       </Button>
