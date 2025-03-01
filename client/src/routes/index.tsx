@@ -15,6 +15,8 @@ import NotFound from "@/pages/NotFound";
 import Emergency from "@/pages/Emergency";
 import ConsultationBooking from "@/pages/ConsultationBooking";
 import MyBookings from "@/pages/MyBookings";
+import HealthFeedPage from "@/pages/HealthFeedPage";
+import RepostsPage from "@/pages/Reposts";
 
 const AppRoutes = () => {
   return (
@@ -31,6 +33,8 @@ const AppRoutes = () => {
       <Route path="/chat" element={<ChatCall />} />
       <Route path="/ai-doctor" element={<AiDoctor />} />
       <Route path="/ayushman" element={<Ayushman />} />
+      <Route path="/health-feed" element={<HealthFeedPage />} />
+      <Route path="/reposts" element={<RepostsPage />} />
       <Route path="/consultation/:doctorId" element={<ConsultationBooking />} />
       <Route path="/my-bookings" element={<MyBookings />} />
       <Route path="*" element={<NotFound />} />

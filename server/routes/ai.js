@@ -2,6 +2,7 @@ import express from 'express';
 import Groq from 'groq-sdk';
 import auth from '../middleware/auth.js';
 import dotenv from 'dotenv';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Load environment variables
 dotenv.config();
@@ -12,6 +13,9 @@ const router = express.Router();
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY || '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'
 });
+
+// Initialize Gemini AI
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Verify API key is loaded
 if (!process.env.GROQ_API_KEY) {
@@ -350,6 +354,56 @@ Respond in JSON format:
     res.status(500).json({
       error: 'Failed to generate command suggestions',
       details: error.message
+    });
+  }
+});
+
+router.post('/analyze-image', async (req, res) => {
+  try {
+    const { image, language } = req.body;
+
+    if (!image) {
+      return res.status(400).json({ error: 'No image provided' });
+    }
+
+    // Initialize the model
+    const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
+
+    // Prepare the image data
+    const imageData = {
+      inlineData: {
+        data: image,
+        mimeType: "image/jpeg",
+      },
+    };
+
+    // Create prompt based on language
+    let prompt = "Analyze this medical or health-related image and provide a detailed but concise description. ";
+    prompt += "Focus on any visible symptoms, medical conditions, or health-related aspects. ";
+    prompt += "Format the response in simple, easy-to-understand language.";
+
+    // Generate content
+    const result = await model.generateContent([prompt, imageData]);
+    const response = await result.response;
+    let description = response.text();
+
+    // If language is not English, translate the response
+    if (language !== 'en') {
+      const translationModel = genAI.getGenerativeModel({ model: "gemini-pro" });
+      const translationPrompt = `Translate the following text to ${language}:\n\n${description}`;
+      const translationResult = await translationModel.generateContent(translationPrompt);
+      description = (await translationResult.response).text();
+    }
+
+    res.json({
+      description,
+      language,
+    });
+  } catch (error) {
+    console.error('Image analysis error:', error);
+    res.status(500).json({ 
+      error: 'Failed to analyze image',
+      details: error.message 
     });
   }
 });

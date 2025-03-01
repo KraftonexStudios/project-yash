@@ -12,6 +12,8 @@ import {
   X,
   Award,
   AlertCircle,
+  Youtube,
+  Share2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -30,6 +32,8 @@ const sidebarItems = [
   { icon: Activity, label: "Symptoms", path: "/symptoms" },
   { icon: Pill, label: "Medicine", path: "/medicine" },
   { icon: Bot, label: "AI Doctor", path: "/ai-doctor" },
+  { icon: Youtube, label: "Health Feed", path: "/health-feed" },
+  { icon: Share2, label: "Reposts", path: "/reposts" },
   { icon: AlertCircle, label: "Emergency", path: "/emergency" },
 ];
 
