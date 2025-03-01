@@ -2,7 +2,7 @@ import { Sidebar } from "./Sidebar";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Menu, Moon, Sun, X, LogOut } from "lucide-react";
-import {  memo } from "react";
+import {  memo, useEffect } from "react";
 // import { useIsMobile } from "@/hooks/use-mobile";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,12 +20,28 @@ import { useAuth } from "@/auth/AuthProvider";
 // import exp from "constants";
 import { Navigation } from "./Navigation";
 import VoiceNavigation from '../VoiceNavigation';
+import { OfflineIndicator } from '@/components/OfflineIndicator';
 
 interface MainLayoutProps {
   children: React.ReactNode;
 }
 
 const MainLayout = ({ children }: MainLayoutProps) => {
+  // Register service worker
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/serviceWorker.js').then(
+          (registration) => {
+            console.log('ServiceWorker registration successful');
+          },
+          (err) => {
+            console.log('ServiceWorker registration failed: ', err);
+          }
+        );
+      });
+    }
+  }, []);
 
   const { toast } = useToast();
   const { setTheme, theme } = useTheme();
@@ -136,6 +152,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       </main>
       <Navigation />
       <VoiceNavigation />
+      <OfflineIndicator />
     </div>
   );
 };

@@ -33,8 +33,6 @@ const sidebarItems = [
     path: "/diet",
   },
   { icon: Award, label: "Ayushman", path: "/ayushman" },
-  { icon: Activity, label: "Symptoms", path: "/symptoms" },
-  { icon: Pill, label: "Medicine", path: "/medicine" },
   { icon: Bot, label: "AI Doctor", path: "/ai-doctor" },
   { icon: AlertCircle, label: "Emergency", path: "/emergency" },
 ];
