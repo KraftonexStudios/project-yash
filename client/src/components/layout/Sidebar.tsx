@@ -14,6 +14,7 @@ import {
   AlertCircle,
   Youtube,
   Share2,
+  Apple,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -28,9 +29,12 @@ const sidebarItems = [
     path: "/health-tracker",
   },
   { icon: Stethoscope, label: "Consult Doctor", path: "/consultation" },
+  {
+    icon: Apple,
+    label: "Diet Plans",
+    path: "/diet",
+  },
   { icon: Award, label: "Ayushman", path: "/ayushman" },
-  { icon: Activity, label: "Symptoms", path: "/symptoms" },
-  { icon: Pill, label: "Medicine", path: "/medicine" },
   { icon: Bot, label: "AI Doctor", path: "/ai-doctor" },
   { icon: Youtube, label: "Health Feed", path: "/health-feed" },
   { icon: Share2, label: "Reposts", path: "/reposts" },

@@ -17,6 +17,9 @@ import ConsultationBooking from "@/pages/ConsultationBooking";
 import MyBookings from "@/pages/MyBookings";
 import HealthFeedPage from "@/pages/HealthFeedPage";
 import RepostsPage from "@/pages/Reposts";
+import Diet from "@/pages/Diet";
+import CalorieCalculator from "@/pages/CalorieCalculator";
+import DoctorDashboard from "@/pages/doctor/DoctorDashboard";
 
 const AppRoutes = () => {
   return (
@@ -25,6 +28,7 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/doc-register" element={<DocRegister />} />
+      <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/health-tracker" element={<HealthTracker />} />
       <Route path="/consultation" element={<Consultation />} />
@@ -37,6 +41,8 @@ const AppRoutes = () => {
       <Route path="/reposts" element={<RepostsPage />} />
       <Route path="/consultation/:doctorId" element={<ConsultationBooking />} />
       <Route path="/my-bookings" element={<MyBookings />} />
+      <Route path="/diet" element={<Diet />} />
+      <Route path="/calorie-calculator" element={<CalorieCalculator />} />
       <Route path="*" element={<NotFound />} />
       <Route path="/emergency" element={<Emergency />} />
     </Routes>

@@ -89,6 +89,11 @@ const Chat = () => {
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const [zegoCloud, setZegoCloud] = useState<any>(null);
 
+  // Get doctorId and instant flag from URL
+  const searchParams = new URLSearchParams(window.location.search);
+  const doctorIdFromUrl = searchParams.get('doctorId');
+  const isInstantConsultation = searchParams.get('instant') === 'true';
+
   // Get current user ID and type
   const currentId = userType === "user" ? currentUser?._id : currentDoctor?._id;
 
@@ -103,6 +108,35 @@ const Chat = () => {
     },
     enabled: !!currentId,
   });
+
+  // Auto-select doctor from URL if present
+  useEffect(() => {
+    if (doctorIdFromUrl && availableUsers) {
+      const doctor = availableUsers.find((user: Doctor) => user._id === doctorIdFromUrl);
+      if (doctor) {
+        setSelectedRecipient(doctor);
+        
+        // If it's an instant consultation, show welcome message
+        if (isInstantConsultation && !messages.length) {
+          const welcomeMessage: Message = {
+            _id: randomID(10),
+            text: `Hello! I'm Dr. ${doctor.firstName} ${doctor.lastName}. How can I help you today?`,
+            sender: {
+              id: doctor._id,
+              type: "doctor" as const
+            },
+            receiver: {
+              id: currentId || "",
+              type: "user" as const
+            },
+            read: false,
+            createdAt: new Date().toISOString()
+          };
+          setMessages([welcomeMessage]);
+        }
+      }
+    }
+  }, [doctorIdFromUrl, availableUsers, isInstantConsultation]);
 
   // Initialize ZegoCloud
   useEffect(() => {
@@ -386,9 +420,21 @@ const Chat = () => {
   return (
     <MainLayout>
       <div className="container mx-auto animate-in">
-        <h1 className="mb-6 text-2xl font-bold">
-          Chat with {userType === "user" ? "Doctors" : "Patients"}
-        </h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">
+            {isInstantConsultation ? 'Instant Consultation' : 'Chat with Doctors'}
+          </h1>
+          {selectedRecipient && (
+            <div className="flex items-center gap-2">
+              <Badge variant={selectedRecipient.isOnline ? "default" : "secondary"}>
+                {selectedRecipient.isOnline ? "Online" : "Offline"}
+              </Badge>
+              {isInstantConsultation && (
+                <Badge variant="default">Instant Consultation</Badge>
+              )}
+            </div>
+          )}
+        </div>
 
         <div className="grid gap-6 md:grid-cols-[300px_1fr]">
           {/* Available Users/Doctors List */}
@@ -638,8 +684,9 @@ const Chat = () => {
                 <div className="text-center">
                   <User2 className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
                   <p>
-                    Select a {userType === "user" ? "doctor" : "user"} to start
-                    chatting
+                    {isInstantConsultation 
+                      ? "Connecting you with the doctor..."
+                      : `Select a ${userType === "user" ? "doctor" : "user"} to start chatting`}
                   </p>
                 </div>
               </CardContent>
