@@ -56,8 +56,8 @@ const GoogleFitDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isSaving, setIsSaving] = useState(false);
 
-  // Get the API base URL from environment or use default
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  // Get the API base URL from environment or use default - ensure no trailing slash
+  const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
 
   const storeFitnessData = async (data: FitnessData[]) => {
     try {
@@ -69,7 +69,8 @@ const GoogleFitDashboard: React.FC = () => {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+          },
+          withCredentials: true
         }
       );
       console.log('Fitness data stored successfully');
@@ -99,8 +100,11 @@ const GoogleFitDashboard: React.FC = () => {
         const startTime = new Date();
         startTime.setDate(startTime.getDate() - 7);
 
+        console.log('Making request to Google Fit API with token:', response.access_token.substring(0, 10) + '...');
+        
+        // First, try to directly use Google's Fitness REST API
         const result = await axios.post(
-          `${API_BASE_URL}/api/google-fitness`,
+          'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',
           {
             aggregateBy: [
               { dataTypeName: 'com.google.step_count.delta' },
@@ -114,12 +118,14 @@ const GoogleFitDashboard: React.FC = () => {
           },
           {
             headers: {
-              Authorization: `Bearer ${response.access_token}`,
               'Content-Type': 'application/json',
+              'Authorization': `Bearer ${response.access_token}`
             },
             timeout: 10000
           }
         );
+
+        console.log('Received data from Google Fit:', result.data);
 
         setRawData(result.data);
         

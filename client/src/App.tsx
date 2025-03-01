@@ -23,7 +23,12 @@ import ChatCall from "./pages/chat/VideoChat";
 import DocRegister from "./auth/DocRegister";
 import AiDoctor from "./pages/AiDoctor";
 import Ayushman from "./pages/Ayushman";
+<<<<<<< HEAD
 import Emergency from "./pages/Emergency";
+=======
+import { SocketProvider } from "@/context/SocketContext";
+import AppRoutes from "@/routes";
+>>>>>>> 47375d7515f9f5fb5b9bf50f845854b811b063b1
 
 const queryClient = new QueryClient();
 
@@ -38,6 +43,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+<<<<<<< HEAD
             <Routes>
               <Route
                 path="/"
@@ -155,6 +161,14 @@ const App = () => (
                 }
               />
             </Routes>
+=======
+            <AuthProvider>
+              <SocketProvider>
+                <AppRoutes />
+                <Toaster />
+              </SocketProvider>
+            </AuthProvider>
+>>>>>>> 47375d7515f9f5fb5b9bf50f845854b811b063b1
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>
