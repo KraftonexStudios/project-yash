@@ -103,7 +103,7 @@ export default function RepostsPage() {
 
   const translateText = async (text: string, targetLang: string): Promise<string> => {
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
       const prompt = `Translate the following text to ${getLanguagePrompt(targetLang)}. 
 Keep the same format and structure, including bullet points. 
 Make sure the translation is natural and fluent.
@@ -131,7 +131,7 @@ ${text}`;
       const base64Image = await getBase64FromFile(selectedImage);
 
       // Get the Gemini Vision Pro model
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
       console.log('Sending request to Gemini with image type:', selectedImage.type);
       

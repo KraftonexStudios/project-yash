@@ -236,7 +236,7 @@ const AiDoctor = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const [voiceText, setVoiceText] = useState("");
-  const recordingTimerRef = useRef<any>(null);
+  const recordingTimerRef = useRef(null);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [showSymptomSelector, setShowSymptomSelector] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState<Language>(languages[0]);
@@ -302,10 +302,10 @@ const AiDoctor = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer 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",
+          Authorization: `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
         },
         body: JSON.stringify({
-          model: "mixtral-8x7b-32768",
+          model: "mistral-saba-24b",
           messages: [
             {
               role: "system",
@@ -431,10 +431,10 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer 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"
+          "Authorization": `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
         },
         body: JSON.stringify({
-          model: "mixtral-8x7b-32768",
+          model: "mistral-saba-24b",
           messages: [
             systemMessage,
             ...contextMessages,
@@ -588,10 +588,10 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer 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"
+          "Authorization": `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
         },
         body: JSON.stringify({
-          model: "mixtral-8x7b-32768",
+          model: "mistral-saba-24b",
           messages: [
             systemMessage,
             ...contextMessages,
